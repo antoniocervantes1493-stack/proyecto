@@ -1,14 +1,12 @@
 <%- include('encabesado.ejs')%>
 
-        <!--Boton nuevo producto-->
         <div class="mt-5 mb-2">
-            <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ventana_nueva_marca"> <img
-                    src="imagenes/nuevo_blanco_25px.png"> Nueva Marca</a>
-            <!-- <input type="button" value="Nuevo producto" class="btn btn-primary"> -->
+            <a href="#" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#ventana_nueva_marca"> 
+                <img src="/imagenes/nuevo_blanco.png"> Nueva Marca
+            </a>
         </div>
 
 
-        <!-- Tabla de productos -->
         <div>
             <div class="card">
                 <div class="card-body">
@@ -31,8 +29,12 @@
                                         <%= fila.marca%>
                                     </td>
                                     <td class="text-center">
-                                        <a href="/editar_marca?id=<%= fila.id %>" class="btn btn-success"> <img src="imagenes/e.png"></a>
-                                        <a href="/eliminar_marca?id=<%= fila.id %>"  class="btn btn-danger"> <img src="imagenes/b.png"></a>
+                                        <a href="/editar_marca?id=<%= fila.id %>" class="btn btn-success"> 
+                                            <img src="/imagenes/edit.png">
+                                        </a>
+                                        <a href="/eliminar_marca?id=<%= fila.id %>" class="btn btn-danger"> 
+                                            <img src="/imagenes/delete.png">
+                                        </a>
                                     </td>
                                 </tr>
                                 <% } %>
@@ -41,10 +43,6 @@
                 </div>
             </div>
         </div>
-        <!-- fin tabla de productos -->
-
-
-        <!-- Ventana de nueva marca -->
         <form action="/nueva_marca" method="post">
         <div class="modal fade" id="ventana_nueva_marca" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
             aria-labelledby="staticBackdropLabel" aria-hidden="true">
@@ -69,8 +67,6 @@
             </div>
         </div>
     </form>
-        <!-- Fin de ventana de nuevo producto-->
-
-    </div>
+        </div>
 
 <%- include('pie_pagina.ejs')%>
