@@ -1,5 +1,5 @@
 const express = require('express')
-const sqlite = require('sqlite3')
+const Database = require('better-sqlite3')
  
 const app = express()
 
@@ -10,29 +10,45 @@ app.set('view engine','ejs')
 app.use(express.static('public'))
 app.use(express.urlencoded({extended:false}))
 
-//********* conecion a base de datos*/
-const base_datos = new sqlite.Database('datos.db',sqlite.OPEN_READWRITE, (error)=>{
-    if (error){
-        console.log('Error al conectarse a la bases de datos')
+//********* conecion a base de datos con better-sqlite3 */
+let base_datos;
+try {
+    base_datos = new Database('datos.db', { fileMustExist: false });
+    console.log('Se conecto a la base de datos con success');
+} catch (error) {
+    console.log('Error al conectarse a la base de datos:', error.message);
+}
 
-    }else{
-        console.log('Se conecto a la base de datos')
+// Adaptador rápido para mantener la compatibilidad con tus consultas (.all y .run)
+base_datos.all = function(sql, params, callback) {
+    if (typeof params === 'function') {
+        callback = params;
+        params = [];
     }
-})
+    try {
+        const stmt = this.prepare(sql);
+        const filas = stmt.all(params);
+        callback(null, filas);
+    } catch (err) {
+        callback(err, null);
+    }
+};
 
-
+base_datos.run = function(sql, params, callback) {
+    if (typeof params === 'function') {
+        callback = params;
+        params = [];
+    }
+    try {
+        const stmt = this.prepare(sql);
+        stmt.run(params);
+        callback(null);
+    } catch (err) {
+        callback(err);
+    }
+};
 
 //********* rutas **********/
-/*app.get('/', (req, res)=>{
-    const sql = 'select * from productos'
-    base_datos.all(sql,(error, resultados)=>{
-        if (error){
-            console.log('Error en la consulta a la base de datos')
-        } else{
-            res.render('principal.ejs',{resultados})
-        }
-    })
-})*/
 app.get('/', (req, res)=>{
     let sql = 'select productos.id, nombre, marcas.marca, precio, stock from productos, marcas where productos.marca = marcas.id'
     base_datos.all(sql,(error, resultado)=>{
@@ -72,8 +88,7 @@ app.post('/buscar', (req, res)=>{
     })
 })
 
-
-app.get('/',(req,res)=>
+app.get('/buscar_alt',(req,res)=>
 {
     const palabra = req.query.buscarx ||'';
     const sql = "select*from productos where nombre LIKE ? OR marca LIKE ?"
@@ -88,7 +103,6 @@ app.get('/',(req,res)=>
             res.render('principal.ejs',{resultados})
         }
     })
-
 })
 
 app.post('/nuevo', (req,res) => {
@@ -97,7 +111,6 @@ app.post('/nuevo', (req,res) => {
     base_datos.run(sql,[nombre, marca, precio, stock], (error) => {
         if (error){
             console.log('error al insertar nuevo producto')
-
         } else{
             res.redirect('/')
         }
@@ -183,7 +196,6 @@ app.post('/nueva_marca', (req,res) => {
     base_datos.run(sql,[marca], (error) => {
         if (error){
             console.log('error al insertar nueva marca')
-
         } else{
             res.redirect('/marcas')
         }
