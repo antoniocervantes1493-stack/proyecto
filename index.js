@@ -54,14 +54,14 @@ app.get('/', (req, res)=>{
 app.post('/buscar', (req, res)=>{
     const filtro = req.body.buscar + '%'
     let sql = 'select productos.id, nombre, marcas.marca, precio, ' +
-        ' stock from productos, marcas where productos.marca = marcas.id'
+        ' stock from productos, marcas where productos.marca = marcas.id ' +
         ' and nombre like ?'
     base_datos.all(sql, [filtro], (error, resultado)=>{
         if (error){
             console.log('Error en la consulta a la base de datos')
         } else {
-            sql = 'select from marcas'
-            base_datos.all(sql, (error, resultado)=>{
+            sql = 'select * from marcas'
+            base_datos.all(sql, (error, marcas)=>{
                 if (error) {
                     console.log('Error al consultar las marcas')
                 } else {
@@ -239,7 +239,8 @@ app.get('/eliminar_marca', (req, res) =>
 })
 
 //********* ejecucion del servidor*/
-app.listen(3000, ()=>{
+const PORT = process.env.PORT || 3000;
 
-    console.log('el Servidor se ejecuto con exito')
-})
+app.listen(PORT, () => {
+    console.log(`El Servidor se ejecuto con exito en el puerto ${PORT}`);
+});
